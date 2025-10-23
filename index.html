@@ -14,7 +14,7 @@
 
   body {
     font-family: 'Cinzel', serif;
-    background: url('sfondo_horror2.jpg') no-repeat center center fixed;
+    background: url('sfondo_horror.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -147,7 +147,7 @@
 </div>
 
 <div id="message"></div>
-<div id="clue"></div>
+<div id="clue">L’indizio segreto apparirà qui...</div>
 
 <button id="readButton" onclick="showClue()">LEGGI</button>
 
@@ -200,19 +200,9 @@
     const formed = [...wordArea.children].map(l => l.textContent).join("");
     if (formed.length === correctWord.length) {
       if (formed === correctWord) {
-        // Mostra messaggio e pulsante dentro riquadro lettere
-        lettersArea.innerHTML = "";
-        const successMessage = document.createElement('div');
-        successMessage.style.color = 'white';
-        successMessage.style.textAlign = 'center';
-        successMessage.style.fontSize = '1em';
-        successMessage.style.marginBottom = '10px';
-        successMessage.textContent = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
-        lettersArea.appendChild(successMessage);
-
+        message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
         lettersArea.appendChild(readButton);
         readButton.style.display = "inline-block";
-
         triggerFlash();
       } else {
         message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
@@ -227,7 +217,6 @@
   }
 
   function showClue() {
-    clue.textContent = "L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!";
     clue.style.display = "block";
     clue.scrollIntoView({ behavior: "smooth" });
   }
