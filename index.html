@@ -73,15 +73,6 @@
     transform: scale(1.1);
   }
 
-  #message {
-    font-size: 1em;
-    text-align: center;
-    padding: 5px 10px;
-    color: white;
-    text-shadow: 0 0 8px #000;
-    min-height: 30px;
-  }
-
   #readButton {
     display: none;
     margin-top: 10px;
@@ -131,6 +122,13 @@
     0% {opacity:0.8;}
     100% {opacity:0;}
   }
+
+  .message {
+    font-size: 1em;
+    text-align: center;
+    color: white;
+    text-shadow: 0 0 8px #000;
+  }
 </style>
 </head>
 <body>
@@ -145,8 +143,6 @@
 <div class="container">
   <p>LETTERE DISPONIBILI:</p>
   <div id="lettersArea" class="letters"></div>
-  <div id="message"></div>
-  <button id="readButton" onclick="showClue()">LEGGI</button>
 </div>
 
 <div id="clue">L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
@@ -156,9 +152,9 @@
   const letters = ["A","S","M","O","D","E","O"];
   const wordArea = document.getElementById("wordArea");
   const lettersArea = document.getElementById("lettersArea");
-  const message = document.getElementById("message");
-  const readButton = document.getElementById("readButton");
   const clue = document.getElementById("clue");
+
+  let readButton = null;
 
   function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
@@ -201,30 +197,39 @@
 
   function checkWord() {
     const formed = [...wordArea.children].map(l => l.textContent).join("");
-    const allMoved = lettersArea.children.length === 0;
 
-    // Se tutte le lettere sono state usate → verifica la parola
-    if (allMoved) {
+    // Se tutte le lettere sono state spostate
+    if (wordArea.children.length === letters.length) {
+      // Verifica la parola
       if (formed === correctWord) {
-        lettersArea.innerHTML = ""; // svuota le lettere
-        message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
-        readButton.style.display = "inline-block";
+        showMessage("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
         triggerFlash();
       } else {
-        lettersArea.innerHTML = ""; // svuota le lettere
-        message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
-        readButton.style.display = "none";
-        clue.style.display = "none";
+        showMessage("❌ PAROLA ERRATA, RIPROVA.", false);
       }
-    } 
-    // Se l'utente toglie una lettera → ripristina le lettere originali
-    else {
-      message.textContent = "";
-      readButton.style.display = "none";
-      clue.style.display = "none";
-      if (lettersArea.children.length === 0) {
+    } else {
+      // Se non ha ancora usato tutte le lettere, svuota eventuali messaggi
+      if (lettersArea.querySelector(".message")) {
+        lettersArea.innerHTML = "";
         createLetterElements();
       }
+    }
+  }
+
+  function showMessage(text, success) {
+    lettersArea.innerHTML = ""; // svuota le lettere
+    const msg = document.createElement("div");
+    msg.classList.add("message");
+    msg.textContent = text;
+    lettersArea.appendChild(msg);
+
+    // Se è corretta aggiungi il tasto "LEGGI"
+    if (success) {
+      readButton = document.createElement("button");
+      readButton.id = "readButton";
+      readButton.textContent = "LEGGI";
+      readButton.onclick = showClue;
+      lettersArea.appendChild(readButton);
     }
   }
 
