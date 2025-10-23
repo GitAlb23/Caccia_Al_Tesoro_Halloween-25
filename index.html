@@ -200,9 +200,20 @@
     const formed = [...wordArea.children].map(l => l.textContent).join("");
     if (formed.length === correctWord.length) {
       if (formed === correctWord) {
-        message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
+        // 🔹 Messaggio + pulsante dentro riquadro lettere
+        lettersArea.innerHTML = "";
+
+        const successMessage = document.createElement('div');
+        successMessage.style.color = 'white';
+        successMessage.style.textAlign = 'center';
+        successMessage.style.fontSize = '1em';
+        successMessage.style.marginBottom = '10px';
+        successMessage.textContent = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
+        lettersArea.appendChild(successMessage);
+
         lettersArea.appendChild(readButton);
         readButton.style.display = "inline-block";
+
         triggerFlash();
       } else {
         message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
