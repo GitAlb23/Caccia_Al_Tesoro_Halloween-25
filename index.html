@@ -79,24 +79,24 @@
     text-shadow: 0 0 10px #000; /* ombra nera invece di rossa */
   }
 
-  #readButton {
+#readButton {
     display: none;
-    margin: 15px 0 0 0; /* più vicino al messaggio */
+    margin-top: 10px;
     background-color: #ff0000;
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 10px 20px;
+    padding: 8px 16px;
     font-size: 16px;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-  }
+}
 
-  #readButton:hover {
+#readButton:hover {
     background-color: #ff3333;
     transform: scale(1.05);
-    box-shadow: 0 0 15px #ff0000;
-  }
+    box-shadow: 0 0 10px #ff0000;
+}
 
   #clue {
     display: none;
@@ -142,7 +142,6 @@
 <div class="container">
   <p>LETTERE DISPONIBILI:</p>
   <div id="lettersArea" class="letters"></div>
-  <button id="readButton" onclick="showClue()">LEGGI</button>
 </div>
 
 <div id="message"></div>
@@ -208,24 +207,29 @@
     checkWord();
   }
 
-  function checkWord() {
-    const formed = [...wordArea.children].map(l => l.textContent).join("");
-    if (formed.length === correctWord.length) {
-      if (formed === correctWord) {
-        message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO. <br><br>CLICCA LEGGI.";
-        readButton.style.display = "inline-block";
-        triggerFlash();
-      } else {
-        message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
-        readButton.style.display = "none";
-        clue.style.display = "none";
-      }
+function checkWord() {
+  const formed = [...wordArea.children].map(l => l.textContent).join("");
+  
+  if (formed.length === correctWord.length) {
+    if (formed === correctWord) {
+      message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
+      
+      // 🔹 Qui spostiamo il pulsante dentro lettersArea
+      lettersArea.appendChild(readButton);
+      readButton.style.display = "inline-block";
+
+      triggerFlash();
     } else {
-      message.textContent = "";
+      message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
       readButton.style.display = "none";
       clue.style.display = "none";
     }
+  } else {
+    message.textContent = "";
+    readButton.style.display = "none";
+    clue.style.display = "none";
   }
+}
 
   function showClue() {
     clue.style.display = "block";
@@ -245,5 +249,6 @@
 
 </body>
 </html>
+
 
 
