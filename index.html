@@ -2,21 +2,123 @@
 <html lang="it">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Caccia al Tesoro Halloween 2025</title>
 <style>
-  html,body{height:100%;margin:0;font-family:'Cinzel',serif;background:url('sfondo_horror2.jpg') center/cover fixed no-repeat;color:#fff}
-  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;box-sizing:border-box}
-  h1{color:#ffcc00;text-shadow:0 0 12px #ff9900;margin:0 0 6px;font-size:1.9rem}
-  .container{width:90%;max-width:420px;background:rgba(0,0,0,0.75);border:2px solid #ff0000;border-radius:12px;padding:12px;text-align:center}
-  .letters{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;align-items:center;justify-content:center}
-  .letter{width:44px;height:44px;border-radius:8px;border:2px solid #ff0000;background:#111;color:#ff3333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;cursor:grab;user-select:none}
-  .letter:active{cursor:grabbing;transform:scale(1.05)}
-  .message{font-size:0.95rem;padding:8px}
-  #readButton{display:none;margin-top:8px;padding:8px 12px;border-radius:8px;border:none;background:#ff0000;color:#fff;cursor:pointer;font-weight:700}
-  #clue{display:none;margin-top:8px;padding:10px;border-radius:10px;border:2px solid #ff0000;background:rgba(0,0,0,0.8);color:#ffcccc;font-style:italic}
-  .flash{position:fixed;inset:0;background:rgba(255,255,255,0.85);animation:flashAnim .3s forwards;pointer-events:none;z-index:9999}
-  @keyframes flashAnim{0%{opacity:0.9}100%{opacity:0}}
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100dvh; /* viewport dinamica compatibile mobile */
+    overflow:hidden;
+    font-family:'Cinzel',serif;
+    background:url('sfondo_horror2.jpg') no-repeat center center fixed;
+    background-size:cover;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:white;
+  }
+
+  h1{
+    color:#ffcc00;
+    text-shadow:0 0 15px #ff9900;
+    margin-bottom:10px;
+    text-align:center;
+  }
+
+  .container{
+    background:rgba(0,0,0,0.7);
+    border:2px solid #ff0000;
+    border-radius:15px;
+    padding:10px;
+    text-align:center;
+    width:90%;
+    max-width:400px;
+    margin:6px 0;
+  }
+
+  .letters{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:6px;
+    min-height:60px;
+  }
+
+  .letter{
+    width:42px;
+    height:42px;
+    background:#111;
+    border:2px solid #ff0000;
+    border-radius:8px;
+    color:#ff3333;
+    font-size:20px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    user-select:none;
+  }
+
+  .letter:active{
+    transform:scale(1.05);
+  }
+
+  .message{
+    font-size:0.95rem;
+    margin:8px 0;
+    color:white;
+    text-shadow:0 0 6px black;
+  }
+
+  #readButton{
+    display:inline-block;
+    margin-top:6px;
+    background-color:#ff0000;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:6px 12px;
+    font-size:15px;
+    cursor:pointer;
+    transition:transform 0.2s,box-shadow 0.2s;
+  }
+
+  #readButton:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 10px #ff0000;
+  }
+
+  #clue{
+    display:none;
+    margin-top:10px;
+    padding:10px;
+    border:2px solid #ff0000;
+    border-radius:10px;
+    background:rgba(0,0,0,0.8);
+    color:#ffcccc;
+    font-style:italic;
+    max-width:400px;
+    text-align:center;
+  }
+
+  .flash{
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,0.8);
+    opacity:0;
+    pointer-events:none;
+    z-index:999;
+    animation:flashAnimation 0.3s forwards;
+  }
+
+  @keyframes flashAnimation{
+    0%{opacity:0.8;}
+    100%{opacity:0;}
+  }
 </style>
 </head>
 <body>
@@ -24,153 +126,126 @@
 <h1>Caccia al Tesoro Halloween 2025</h1>
 
 <div class="container">
-  <p style="margin:6px 0 10px">COMPONI LA PAROLA:</p>
+  <p>COMPONI LA PAROLA:</p>
   <div id="wordArea" class="letters"></div>
 </div>
 
 <div class="container">
-  <p style="margin:6px 0 10px">LETTERE DISPONIBILI:</p>
+  <p>LETTERE DISPONIBILI:</p>
   <div id="lettersArea" class="letters"></div>
 </div>
 
 <div id="clue">L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
 
 <script>
-/* CONFIG */
 const correctWord = "ASMODEO";
 const letters = ["A","S","M","O","D","E","O"];
 
-/* ELEMENTI */
-const wordArea = document.getElementById('wordArea');
-const lettersArea = document.getElementById('lettersArea');
-const clue = document.getElementById('clue');
+const wordArea = document.getElementById("wordArea");
+const lettersArea = document.getElementById("lettersArea");
+const clue = document.getElementById("clue");
 
-let readButton = null;
+function shuffle(array){ return array.slice().sort(()=>Math.random()-0.5); }
 
-/* UTILS */
-function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
 function triggerFlash(){
-  const f = document.createElement('div'); f.className='flash'; document.body.appendChild(f);
-  setTimeout(()=>f.remove(),300);
+  const flash=document.createElement("div");
+  flash.classList.add("flash");
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),300);
 }
 
-/* CREAZIONE LETTERE IN LETTERSAREA */
-function createLetterElements() {
-  lettersArea.innerHTML = '';
-  const shuffled = shuffle(letters);
-  shuffled.forEach((ch, i) => {
-    const el = document.createElement('div');
-    el.className = 'letter';
-    el.textContent = ch;
-    el.draggable = true;
-    el.id = 'letter-'+i+'-'+Date.now(); // id unico
-    // dragstart
-    el.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('text/plain', el.id);
-    });
-    // click per spostare con mouse/tap
-    el.addEventListener('click', () => toggleMove(el));
+function createLetterElements(){
+  lettersArea.innerHTML="";
+  const shuffled=shuffle(letters);
+  shuffled.forEach((letter,i)=>{
+    const el=document.createElement("div");
+    el.className="letter";
+    el.textContent=letter;
+    el.draggable=true;
+    el.id="letter"+i;
+    el.addEventListener("dragstart",drag);
+    el.addEventListener("click",()=>moveLetter(el));
     lettersArea.appendChild(el);
   });
 }
 
-/* toggle click: sposta tra aree */
-function toggleMove(el) {
-  if (el.parentElement === lettersArea) {
+function allowDrop(ev){ev.preventDefault();}
+function drag(ev){ev.dataTransfer.setData("text",ev.target.id);}
+function drop(ev){
+  ev.preventDefault();
+  const id=ev.dataTransfer.getData("text");
+  const letter=document.getElementById(id);
+  if(!letter)return;
+  if(ev.currentTarget.classList.contains("letters")){
+    ev.currentTarget.appendChild(letter);
+    checkWord();
+  }
+}
+
+function moveLetter(el){
+  if(el.parentElement===lettersArea){
     wordArea.appendChild(el);
-  } else {
-    // se lettersArea contiene messaggio (errore/complimenti) lo rimuoviamo prima di riportare la lettera
-    const msg = lettersArea.querySelector('.message');
-    if (msg) { lettersArea.innerHTML = ''; } // rimuove messaggio
+  }else{
     lettersArea.appendChild(el);
   }
-  // dopo ogni spostamento controlla lo stato
   checkWord();
 }
 
-/* DROP HANDLERS: usiamo currentTarget per essere robusti */
-function allowDrop(ev){ ev.preventDefault(); }
-function onDropToArea(ev) {
-  ev.preventDefault();
-  const id = ev.dataTransfer.getData('text/plain');
-  const el = document.getElementById(id);
-  if (!el) return;
-  // append sempre al currentTarget (la "zona" su cui hai droppato)
-  ev.currentTarget.appendChild(el);
-  checkWord();
+wordArea.addEventListener("dragover",allowDrop);
+lettersArea.addEventListener("dragover",allowDrop);
+wordArea.addEventListener("drop",drop);
+lettersArea.addEventListener("drop",drop);
+
+function clearMessages(){
+  const msg=document.querySelector(".message");
+  if(msg) msg.remove();
+  const btn=document.getElementById("readButton");
+  if(btn) btn.remove();
 }
 
-/* ATTACH drop listeners su entrambe le aree */
-wordArea.addEventListener('dragover', allowDrop);
-lettersArea.addEventListener('dragover', allowDrop);
-wordArea.addEventListener('drop', onDropToArea);
-lettersArea.addEventListener('drop', onDropToArea);
-
-/* CONTROLLA SE TUTTE LE LETTERE SONO STATE SPOSTATE */
 function checkWord(){
-  const formed = Array.from(wordArea.children).filter(n=>n.classList.contains('letter')).map(n=>n.textContent).join('');
-  const allPlaced = wordArea.querySelectorAll('.letter').length === letters.length;
+  const formed=[...wordArea.children].map(l=>l.textContent).join("");
+  const allPlaced=wordArea.children.length===letters.length;
 
-  // Se TUTTE le lettere sono nel wordArea -> valuta
-  if (allPlaced) {
-    if (formed === correctWord) {
-      showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
-      triggerFlash();
-    } else {
-      showMessageInLettersArea("❌ PAROLA ERRATA, RIPROVA.", false);
-    }
-    return;
+  // se l'utente ha iniziato a spostare le lettere di nuovo, cancella messaggi
+  if(wordArea.children.length<letters.length){
+    const msg=document.querySelector(".message");
+    if(msg) clearMessages();
+    clue.style.display="none";
   }
 
-  // Se NON tutte le lettere e lettersArea contiene un messaggio, lo rimuoviamo
-  const existingMsg = lettersArea.querySelector('.message');
-  if (existingMsg) {
-    lettersArea.innerHTML = '';
-    // non ricreiamo tutte le lettere automaticamente: lasciamo quelle che l'utente può riportare manualmente
-    // (se vuoi che ricompaiano tutte subito, posso modificare per resettare wordArea->lettersArea)
-  }
-}
+  if(!allPlaced)return; // controlla solo quando tutte le lettere sono piazzate
 
-/* MOSTRA MESSAGGIO DENTRO lettersArea (sostituisce le lettere) */
-function showMessageInLettersArea(text, success) {
-  // svuota lettersArea (quindi le lettere restano in wordArea)
-  lettersArea.innerHTML = '';
+  clearMessages();
 
-  // crea messaggio
-  const msg = document.createElement('div');
-  msg.className = 'message';
-  msg.textContent = text;
-  lettersArea.appendChild(msg);
+  const msg=document.createElement("div");
+  msg.className="message";
 
-  // se è successo, aggiungi anche il pulsante LEGGI nello stesso riquadro
-  if (success) {
-    readButton = document.createElement('button');
-    readButton.id = 'readButton';
-    readButton.textContent = 'LEGGI';
-    readButton.addEventListener('click', showClue);
-    readButton.style.display = 'inline-block';
-    lettersArea.appendChild(readButton);
-  } else {
-    readButton = null;
+  if(formed===correctWord){
+    msg.textContent="👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
+    lettersArea.innerHTML="";
+    lettersArea.appendChild(msg);
+
+    const btn=document.createElement("button");
+    btn.id="readButton";
+    btn.textContent="LEGGI";
+    btn.addEventListener("click",showClue);
+    lettersArea.appendChild(btn);
+
+    triggerFlash();
+  }else{
+    msg.textContent="❌ PAROLA ERRATA, RIPROVA.";
+    lettersArea.innerHTML="";
+    lettersArea.appendChild(msg);
   }
 }
 
-/* Mostra indizio (non altera il messaggio già visibile in lettersArea) */
 function showClue(){
-  clue.style.display = 'block';
-  clue.scrollIntoView({behavior:'smooth', block:'end'});
+  clue.style.display="block";
+  clue.scrollIntoView({behavior:"smooth"});
 }
 
-/* inizializza */
 createLetterElements();
-
-/* Note:
- - Comportamento di retry: quando compare "PAROLA ERRATA", le lettere fisicamente sono nel wordArea.
-   Se l'utente vuole ricominciare può riportare INDIVIDUALMENTE una lettera in basso (click o drag);
-   al primo spostamento in lettersArea il messaggio scompare e la lettera resta pronta per essere riutilizzata.
- - Se preferisci che alla comparsa di "PAROLA ERRATA" venga mostrato anche un bottone "RIPROVA" che automaticamente riporta tutte le lettere in basso,
-   dimmelo e lo aggiungo: al momento ho scelto il comportamento che permette all'utente di riportare manualmente le lettere (più interattivo).
-*/
 </script>
 
 </body>
