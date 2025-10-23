@@ -191,8 +191,11 @@
   }
 
   function moveLetter(el) {
-    if (el.parentElement === lettersArea) wordArea.appendChild(el);
-    else lettersArea.appendChild(el);
+    if (el.parentElement === lettersArea) {
+      wordArea.appendChild(el);
+    } else {
+      lettersArea.appendChild(el);
+    }
     checkWord();
   }
 
@@ -200,20 +203,28 @@
     const formed = [...wordArea.children].map(l => l.textContent).join("");
     const allMoved = lettersArea.children.length === 0;
 
+    // Se tutte le lettere sono state usate → verifica la parola
     if (allMoved) {
       if (formed === correctWord) {
+        lettersArea.innerHTML = ""; // svuota le lettere
         message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
         readButton.style.display = "inline-block";
         triggerFlash();
       } else {
+        lettersArea.innerHTML = ""; // svuota le lettere
         message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
         readButton.style.display = "none";
         clue.style.display = "none";
       }
-    } else {
+    } 
+    // Se l'utente toglie una lettera → ripristina le lettere originali
+    else {
       message.textContent = "";
       readButton.style.display = "none";
       clue.style.display = "none";
+      if (lettersArea.children.length === 0) {
+        createLetterElements();
+      }
     }
   }
 
