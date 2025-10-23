@@ -1,134 +1,22 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Caccia al Tesoro Halloween 2025</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  body {
-    font-family: 'Cinzel', serif;
-    background: url('sfondo_horror2.jpg') no-repeat center center fixed;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    color: white;
-  }
-
-  h1 {
-    text-align: center;
-    color: #ffcc00;
-    text-shadow: 0 0 15px #ff9900;
-    letter-spacing: 2px;
-    font-size: 2em;
-    margin: 5px 0;
-  }
-
-  .container {
-    background: rgba(0,0,0,0.7);
-    border: 2px solid #ff0000;
-    border-radius: 15px;
-    padding: 10px;
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-  }
-
-  .letters {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-    min-height: 60px;
-    align-items: center;
-  }
-
-  .letter {
-    width: 40px;
-    height: 40px;
-    background: #111;
-    border: 2px solid #ff0000;
-    border-radius: 8px;
-    color: #ff3333;
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    user-select: none;
-    transition: transform 0.1s;
-  }
-
-  .letter:active {
-    cursor: grabbing;
-    transform: scale(1.1);
-  }
-
-  #readButton {
-    display: none;
-    margin-top: 10px;
-    background-color: #ff0000;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  #readButton:hover {
-    background-color: #ff3333;
-    transform: scale(1.05);
-    box-shadow: 0 0 10px #ff0000;
-  }
-
-  #clue {
-    display: none;
-    margin-top: 10px;
-    padding: 10px;
-    border: 2px solid #ff0000;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.8);
-    color: #ffcccc;
-    font-style: italic;
-    max-width: 400px;
-    text-align: center;
-  }
-
-  .flash {
-    position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background: rgba(255, 255, 255, 0.8);
-    opacity:0;
-    pointer-events:none;
-    z-index: 1000;
-    animation: flashAnimation 0.3s forwards;
-  }
-
-  @keyframes flashAnimation {
-    0% {opacity:0.8;}
-    100% {opacity:0;}
-  }
-
-  .message {
-    font-size: 1em;
-    text-align: center;
-    color: white;
-    text-shadow: 0 0 8px #000;
-  }
+  html,body{height:100%;margin:0;font-family:'Cinzel',serif;background:url('sfondo_horror2.jpg') center/cover fixed no-repeat;color:#fff}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;box-sizing:border-box}
+  h1{color:#ffcc00;text-shadow:0 0 12px #ff9900;margin:0 0 6px;font-size:1.9rem}
+  .container{width:90%;max-width:420px;background:rgba(0,0,0,0.75);border:2px solid #ff0000;border-radius:12px;padding:12px;text-align:center}
+  .letters{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;align-items:center;justify-content:center}
+  .letter{width:44px;height:44px;border-radius:8px;border:2px solid #ff0000;background:#111;color:#ff3333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;cursor:grab;user-select:none}
+  .letter:active{cursor:grabbing;transform:scale(1.05)}
+  .message{font-size:0.95rem;padding:8px}
+  #readButton{display:none;margin-top:8px;padding:8px 12px;border-radius:8px;border:none;background:#ff0000;color:#fff;cursor:pointer;font-weight:700}
+  #clue{display:none;margin-top:8px;padding:10px;border-radius:10px;border:2px solid #ff0000;background:rgba(0,0,0,0.8);color:#ffcccc;font-style:italic}
+  .flash{position:fixed;inset:0;background:rgba(255,255,255,0.85);animation:flashAnim .3s forwards;pointer-events:none;z-index:9999}
+  @keyframes flashAnim{0%{opacity:0.9}100%{opacity:0}}
 </style>
 </head>
 <body>
@@ -136,116 +24,153 @@
 <h1>Caccia al Tesoro Halloween 2025</h1>
 
 <div class="container">
-  <p>COMPONI LA PAROLA:</p>
-  <div id="wordArea" class="letters" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+  <p style="margin:6px 0 10px">COMPONI LA PAROLA:</p>
+  <div id="wordArea" class="letters"></div>
 </div>
 
 <div class="container">
-  <p>LETTERE DISPONIBILI:</p>
+  <p style="margin:6px 0 10px">LETTERE DISPONIBILI:</p>
   <div id="lettersArea" class="letters"></div>
 </div>
 
 <div id="clue">L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
 
 <script>
-  const correctWord = "ASMODEO";
-  const letters = ["A","S","M","O","D","E","O"];
-  const wordArea = document.getElementById("wordArea");
-  const lettersArea = document.getElementById("lettersArea");
-  const clue = document.getElementById("clue");
+/* CONFIG */
+const correctWord = "ASMODEO";
+const letters = ["A","S","M","O","D","E","O"];
 
-  let readButton = null;
+/* ELEMENTI */
+const wordArea = document.getElementById('wordArea');
+const lettersArea = document.getElementById('lettersArea');
+const clue = document.getElementById('clue');
 
-  function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
-  }
+let readButton = null;
 
-  function createLetterElements() {
-    lettersArea.innerHTML = "";
-    shuffle([...letters]).forEach((letter, index) => {
-      const el = document.createElement("div");
-      el.classList.add("letter");
-      el.textContent = letter;
-      el.draggable = true;
-      el.id = "letter" + index;
-      el.addEventListener("dragstart", drag);
-      el.addEventListener("click", () => moveLetter(el));
-      lettersArea.appendChild(el);
+/* UTILS */
+function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+function triggerFlash(){
+  const f = document.createElement('div'); f.className='flash'; document.body.appendChild(f);
+  setTimeout(()=>f.remove(),300);
+}
+
+/* CREAZIONE LETTERE IN LETTERSAREA */
+function createLetterElements() {
+  lettersArea.innerHTML = '';
+  const shuffled = shuffle(letters);
+  shuffled.forEach((ch, i) => {
+    const el = document.createElement('div');
+    el.className = 'letter';
+    el.textContent = ch;
+    el.draggable = true;
+    el.id = 'letter-'+i+'-'+Date.now(); // id unico
+    // dragstart
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', el.id);
     });
-  }
+    // click per spostare con mouse/tap
+    el.addEventListener('click', () => toggleMove(el));
+    lettersArea.appendChild(el);
+  });
+}
 
-  function allowDrop(ev) { ev.preventDefault(); }
-  function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-  function drop(ev) {
-    ev.preventDefault();
-    const id = ev.dataTransfer.getData("text");
-    const letter = document.getElementById(id);
-    if (ev.target.classList.contains("letters")) {
-      ev.target.appendChild(letter);
-      checkWord();
-    }
+/* toggle click: sposta tra aree */
+function toggleMove(el) {
+  if (el.parentElement === lettersArea) {
+    wordArea.appendChild(el);
+  } else {
+    // se lettersArea contiene messaggio (errore/complimenti) lo rimuoviamo prima di riportare la lettera
+    const msg = lettersArea.querySelector('.message');
+    if (msg) { lettersArea.innerHTML = ''; } // rimuove messaggio
+    lettersArea.appendChild(el);
   }
+  // dopo ogni spostamento controlla lo stato
+  checkWord();
+}
 
-  function moveLetter(el) {
-    if (el.parentElement === lettersArea) {
-      wordArea.appendChild(el);
+/* DROP HANDLERS: usiamo currentTarget per essere robusti */
+function allowDrop(ev){ ev.preventDefault(); }
+function onDropToArea(ev) {
+  ev.preventDefault();
+  const id = ev.dataTransfer.getData('text/plain');
+  const el = document.getElementById(id);
+  if (!el) return;
+  // append sempre al currentTarget (la "zona" su cui hai droppato)
+  ev.currentTarget.appendChild(el);
+  checkWord();
+}
+
+/* ATTACH drop listeners su entrambe le aree */
+wordArea.addEventListener('dragover', allowDrop);
+lettersArea.addEventListener('dragover', allowDrop);
+wordArea.addEventListener('drop', onDropToArea);
+lettersArea.addEventListener('drop', onDropToArea);
+
+/* CONTROLLA SE TUTTE LE LETTERE SONO STATE SPOSTATE */
+function checkWord(){
+  const formed = Array.from(wordArea.children).filter(n=>n.classList.contains('letter')).map(n=>n.textContent).join('');
+  const allPlaced = wordArea.querySelectorAll('.letter').length === letters.length;
+
+  // Se TUTTE le lettere sono nel wordArea -> valuta
+  if (allPlaced) {
+    if (formed === correctWord) {
+      showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
+      triggerFlash();
     } else {
-      lettersArea.appendChild(el);
+      showMessageInLettersArea("❌ PAROLA ERRATA, RIPROVA.", false);
     }
-    checkWord();
+    return;
   }
 
-  function checkWord() {
-    const formed = [...wordArea.children].map(l => l.textContent).join("");
-
-    // Se tutte le lettere sono state spostate
-    if (wordArea.children.length === letters.length) {
-      // Verifica la parola
-      if (formed === correctWord) {
-        showMessage("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
-        triggerFlash();
-      } else {
-        showMessage("❌ PAROLA ERRATA, RIPROVA.", false);
-      }
-    } else {
-      // Se non ha ancora usato tutte le lettere, svuota eventuali messaggi
-      if (lettersArea.querySelector(".message")) {
-        lettersArea.innerHTML = "";
-        createLetterElements();
-      }
-    }
+  // Se NON tutte le lettere e lettersArea contiene un messaggio, lo rimuoviamo
+  const existingMsg = lettersArea.querySelector('.message');
+  if (existingMsg) {
+    lettersArea.innerHTML = '';
+    // non ricreiamo tutte le lettere automaticamente: lasciamo quelle che l'utente può riportare manualmente
+    // (se vuoi che ricompaiano tutte subito, posso modificare per resettare wordArea->lettersArea)
   }
+}
 
-  function showMessage(text, success) {
-    lettersArea.innerHTML = ""; // svuota le lettere
-    const msg = document.createElement("div");
-    msg.classList.add("message");
-    msg.textContent = text;
-    lettersArea.appendChild(msg);
+/* MOSTRA MESSAGGIO DENTRO lettersArea (sostituisce le lettere) */
+function showMessageInLettersArea(text, success) {
+  // svuota lettersArea (quindi le lettere restano in wordArea)
+  lettersArea.innerHTML = '';
 
-    // Se è corretta aggiungi il tasto "LEGGI"
-    if (success) {
-      readButton = document.createElement("button");
-      readButton.id = "readButton";
-      readButton.textContent = "LEGGI";
-      readButton.onclick = showClue;
-      lettersArea.appendChild(readButton);
-    }
+  // crea messaggio
+  const msg = document.createElement('div');
+  msg.className = 'message';
+  msg.textContent = text;
+  lettersArea.appendChild(msg);
+
+  // se è successo, aggiungi anche il pulsante LEGGI nello stesso riquadro
+  if (success) {
+    readButton = document.createElement('button');
+    readButton.id = 'readButton';
+    readButton.textContent = 'LEGGI';
+    readButton.addEventListener('click', showClue);
+    readButton.style.display = 'inline-block';
+    lettersArea.appendChild(readButton);
+  } else {
+    readButton = null;
   }
+}
 
-  function showClue() {
-    clue.style.display = "block";
-    clue.scrollIntoView({ behavior: "smooth" });
-  }
+/* Mostra indizio (non altera il messaggio già visibile in lettersArea) */
+function showClue(){
+  clue.style.display = 'block';
+  clue.scrollIntoView({behavior:'smooth', block:'end'});
+}
 
-  function triggerFlash() {
-    const flash = document.createElement('div');
-    flash.classList.add('flash');
-    document.body.appendChild(flash);
-    setTimeout(() => document.body.removeChild(flash), 300);
-  }
+/* inizializza */
+createLetterElements();
 
-  createLetterElements();
+/* Note:
+ - Comportamento di retry: quando compare "PAROLA ERRATA", le lettere fisicamente sono nel wordArea.
+   Se l'utente vuole ricominciare può riportare INDIVIDUALMENTE una lettera in basso (click o drag);
+   al primo spostamento in lettersArea il messaggio scompare e la lettera resta pronta per essere riutilizzata.
+ - Se preferisci che alla comparsa di "PAROLA ERRATA" venga mostrato anche un bottone "RIPROVA" che automaticamente riporta tutte le lettere in basso,
+   dimmelo e lo aggiungo: al momento ho scelto il comportamento che permette all'utente di riportare manualmente le lettere (più interattivo).
+*/
 </script>
 
 </body>
