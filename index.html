@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caccia al Tesoro Halloween 2025</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: url('sfondo_horror.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Cinzel', serif;
+    color: #ff3333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  h1 {
+    text-shadow: 0 0 15px #ff0000;
+    letter-spacing: 2px;
+  }
+
+  .container {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ff0000;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .letters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    min-height: 60px;
+  }
+
+  .letter {
+    width: 50px;
+    height: 50px;
+    background: #111;
+    border: 2px solid #ff0000;
+    border-radius: 8px;
+    color: #ff3333;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.1s;
+  }
+
+  .letter:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+  }
+
+  #message {
+    margin-top: 20px;
+    font-size: 1.1em;
+    text-shadow: 0 0 8px #ff0000;
+    text-align: center;
+    padding: 0 15px;
+  }
+
+  #readButton {
+    display: none;
+    margin-top: 20px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  #readButton:hover {
+    background-color: #ff3333;
+  }
+
+  #clue {
+    display: none;
+    margin-top: 25px;
+    padding: 15px;
+    border: 2px solid #ff0000;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.8);
+    color: #ffcccc;
+    font-style: italic;
+    max-width: 400px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Caccia al Tesoro Halloween 2025</h1>
+
+<div class="container">
+  <p>COMPONI LA PAROLA:</p>
+  <div id="wordArea" class="letters" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+</div>
+
+<div class="container">
+  <p>LETTERE DISPONIBILI:</p>
+  <div id="lettersArea" class="letters"></div>
+</div>
+
+<div id="message"></div>
+<button id="readButton" onclick="showClue()">LEGGI</button>
+
+<div id="clue">
+  <!-- 🔮 QUI SCRIVI IL TUO INDIZIO FINALE -->
+  L’indizio segreto apparirà qui... 
+</div>
+
+<script>
+  const correctWord = "ASMODEO";
+  const letters = ["A", "S", "M", "O", "D", "E", "O"];
+  const wordArea = document.getElementById("wordArea");
+  const lettersArea = document.getElementById("lettersArea");
+  const message = document.getElementById("message");
+  const readButton = document.getElementById("readButton");
+  const clue = document.getElementById("clue");
+
+  function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  function createLetterElements() {
+    lettersArea.innerHTML = "";
+    shuffle([...letters]).forEach((letter, index) => {
+      const el = document.createElement("div");
+      el.classList.add("letter");
+      el.textContent = letter;
+      el.draggable = true;
+      el.id = "letter" + index;
+
+      el.addEventListener("dragstart", drag);
+      el.addEventListener("click", () => moveLetter(el));
+
+      lettersArea.appendChild(el);
+    });
+  }
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
+  function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+  }
+
+  function drop(ev) {
+    ev.preventDefault();
+    const id = ev.dataTransfer.getData("text");
+    const letter = document.getElementById(id);
+    if (ev.target.classList.contains("letters")) {
+      ev.target.appendChild(letter);
+      checkWord();
+    }
+  }
+
+  function moveLetter(el) {
+    if (el.parentElement === lettersArea) {
+      wordArea.appendChild(el);
+    } else {
+      lettersArea.appendChild(el);
+    }
+    checkWord();
+  }
+
+  function checkWord() {
+    const formed = [...wordArea.children].map(l => l.textContent).join("");
+    if (formed.length === correctWord.length) {
+      if (formed === correctWord) {
+        message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO. <br><br>CLICCA LEGGI.";
+        readButton.style.display = "inline-block";
+      } else {
+        message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
+        readButton.style.display = "none";
+        clue.style.display = "none";
+      }
+    } else {
+      message.textContent = "";
+      readButton.style.display = "none";
+      clue.style.display = "none";
+    }
+  }
+
+  function showClue() {
+    clue.style.display = "block";
+    clue.scrollIntoView({ behavior: "smooth" });
+  }
+
+  createLetterElements();
+</script>
+
+</body>
+</html>
