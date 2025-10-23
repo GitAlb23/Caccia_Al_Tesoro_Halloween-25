@@ -5,22 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Caccia al Tesoro Halloween 2025</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    overflow: hidden; /* niente scroll */
-  }
-
   body {
-    font-family: 'Cinzel', serif;
+    margin: 0;
+    height: 100vh;
     background: url('sfondo_horror.jpg') no-repeat center center fixed;
     background-size: cover;
+    font-family: 'Cinzel', serif;
+    color: #ff3333;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
     align-items: center;
-    color: white;
+    justify-content: flex-start;
+    padding-top: 40px;
+    overflow-x: hidden;
   }
 
   h1 {
@@ -28,36 +25,37 @@
     color: #ffcc00; /* giallo fuoco */
     text-shadow: 0 0 15px #ff9900;
     letter-spacing: 2px;
-    font-size: 2em;
-    margin: 5px 0;
+    margin-bottom: 30px;
+    font-size: 2.5em;
   }
 
   .container {
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     border: 2px solid #ff0000;
     border-radius: 15px;
-    padding: 10px;
-    text-align: center;
+    padding: 20px;
+    margin: 15px 0;
     width: 90%;
     max-width: 400px;
+    text-align: center;
   }
 
   .letters {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 5px;
-    min-height: 50px;
+    gap: 10px;
+    min-height: 60px;
   }
 
   .letter {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background: #111;
     border: 2px solid #ff0000;
     border-radius: 8px;
     color: #ff3333;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -73,44 +71,43 @@
   }
 
   #message {
-    font-size: 1em;
+    margin-top: 20px;
+    font-size: 1.2em;
     text-align: center;
-    padding: 0 10px;
-    color: white;
-    text-shadow: 0 0 8px #000;
+    padding: 0 15px;
+    color: white; /* messaggi in bianco */
+    text-shadow: 0 0 10px #000; /* ombra nera invece di rossa */
   }
 
-  #readButton {
+#readButton {
     display: none;
     margin-top: 10px;
     background-color: #ff0000;
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 6px 12px;
+    padding: 8px 16px;
     font-size: 16px;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-  }
+}
 
-  #readButton:hover {
+#readButton:hover {
     background-color: #ff3333;
     transform: scale(1.05);
     box-shadow: 0 0 10px #ff0000;
-  }
+}
 
   #clue {
     display: none;
-    margin-top: 20px; /* più staccato dal bordo e dagli elementi sopra */
+    margin-top: 25px;
     padding: 15px;
     border: 2px solid #ff0000;
     border-radius: 10px;
     background: rgba(0,0,0,0.8);
     color: #ffcccc;
     font-style: italic;
-    font-size: 1.2em; /* testo più grande */
     max-width: 400px;
-    text-align: center;
   }
 
   /* Effetto lampo */
@@ -120,7 +117,7 @@
     left:0;
     width:100%;
     height:100%;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.8); /* semi-trasparente */
     opacity:0;
     pointer-events:none;
     z-index: 1000;
@@ -148,13 +145,15 @@
 </div>
 
 <div id="message"></div>
-<div id="clue">L’indizio segreto apparirà qui...</div>
-
 <button id="readButton" onclick="showClue()">LEGGI</button>
+
+<div id="clue">
+  L’indizio segreto apparirà qui... 
+</div>
 
 <script>
   const correctWord = "ASMODEO";
-  const letters = ["A","S","M","O","D","E","O"];
+  const letters = ["A", "S", "M", "O", "D", "E", "O"];
   const wordArea = document.getElementById("wordArea");
   const lettersArea = document.getElementById("lettersArea");
   const message = document.getElementById("message");
@@ -173,14 +172,22 @@
       el.textContent = letter;
       el.draggable = true;
       el.id = "letter" + index;
+
       el.addEventListener("dragstart", drag);
       el.addEventListener("click", () => moveLetter(el));
+
       lettersArea.appendChild(el);
     });
   }
 
-  function allowDrop(ev) { ev.preventDefault(); }
-  function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
+  function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+  }
+
   function drop(ev) {
     ev.preventDefault();
     const id = ev.dataTransfer.getData("text");
@@ -192,37 +199,44 @@
   }
 
   function moveLetter(el) {
-    if (el.parentElement === lettersArea) wordArea.appendChild(el);
-    else lettersArea.appendChild(el);
+    if (el.parentElement === lettersArea) {
+      wordArea.appendChild(el);
+    } else {
+      lettersArea.appendChild(el);
+    }
     checkWord();
   }
 
-  function checkWord() {
-    const formed = [...wordArea.children].map(l => l.textContent).join("");
-    if (formed.length === correctWord.length) {
-      if (formed === correctWord) {
-        message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
-        lettersArea.appendChild(readButton);
-        readButton.style.display = "inline-block";
-        triggerFlash();
-      } else {
-        message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
-        readButton.style.display = "none";
-        clue.style.display = "none";
-      }
+function checkWord() {
+  const formed = [...wordArea.children].map(l => l.textContent).join("");
+  
+  if (formed.length === correctWord.length) {
+    if (formed === correctWord) {
+      message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
+      
+      // 🔹 Qui spostiamo il pulsante dentro lettersArea
+      lettersArea.appendChild(readButton);
+      readButton.style.display = "inline-block";
+
+      triggerFlash();
     } else {
-      message.textContent = "";
+      message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
       readButton.style.display = "none";
       clue.style.display = "none";
     }
+  } else {
+    message.textContent = "";
+    readButton.style.display = "none";
+    clue.style.display = "none";
   }
+}
 
   function showClue() {
-    clue.textContent = "L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!";
     clue.style.display = "block";
     clue.scrollIntoView({ behavior: "smooth" });
   }
 
+  // Funzione lampo
   function triggerFlash() {
     const flash = document.createElement('div');
     flash.classList.add('flash');
@@ -235,3 +249,5 @@
 
 </body>
 </html>
+
+
