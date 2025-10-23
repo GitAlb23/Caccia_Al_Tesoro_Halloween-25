@@ -9,7 +9,7 @@
     margin: 0;
     padding: 0;
     height: 100vh;
-    overflow: hidden; /* niente scroll */
+    overflow: hidden;
   }
 
   body {
@@ -25,7 +25,7 @@
 
   h1 {
     text-align: center;
-    color: #ffcc00; /* giallo fuoco */
+    color: #ffcc00;
     text-shadow: 0 0 15px #ff9900;
     letter-spacing: 2px;
     font-size: 2em;
@@ -47,7 +47,8 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 5px;
-    min-height: 50px;
+    min-height: 60px;
+    align-items: center;
   }
 
   .letter {
@@ -75,9 +76,10 @@
   #message {
     font-size: 1em;
     text-align: center;
-    padding: 0 10px;
+    padding: 5px 10px;
     color: white;
     text-shadow: 0 0 8px #000;
+    min-height: 30px;
   }
 
   #readButton {
@@ -112,7 +114,6 @@
     text-align: center;
   }
 
-  /* Effetto lampo */
   .flash {
     position: fixed;
     top:0;
@@ -144,12 +145,11 @@
 <div class="container">
   <p>LETTERE DISPONIBILI:</p>
   <div id="lettersArea" class="letters"></div>
+  <div id="message"></div>
+  <button id="readButton" onclick="showClue()">LEGGI</button>
 </div>
 
-<div id="message"></div>
 <div id="clue">L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
-
-<button id="readButton" onclick="showClue()">LEGGI</button>
 
 <script>
   const correctWord = "ASMODEO";
@@ -198,10 +198,11 @@
 
   function checkWord() {
     const formed = [...wordArea.children].map(l => l.textContent).join("");
-    if (formed.length === correctWord.length) {
+    const allMoved = lettersArea.children.length === 0;
+
+    if (allMoved) {
       if (formed === correctWord) {
         message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.";
-        lettersArea.appendChild(readButton);
         readButton.style.display = "inline-block";
         triggerFlash();
       } else {
@@ -233,4 +234,3 @@
 
 </body>
 </html>
-
