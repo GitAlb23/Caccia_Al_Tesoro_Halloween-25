@@ -17,11 +17,16 @@
     align-items: center;
     justify-content: flex-start;
     padding-top: 40px;
+    overflow-x: hidden;
   }
 
   h1 {
-    text-shadow: 0 0 15px #ff0000;
+    text-align: center;
+    color: #ffcc00; /* giallo fuoco */
+    text-shadow: 0 0 15px #ff9900;
     letter-spacing: 2px;
+    margin-bottom: 30px;
+    font-size: 2.5em;
   }
 
   .container {
@@ -67,15 +72,16 @@
 
   #message {
     margin-top: 20px;
-    font-size: 1.1em;
-    text-shadow: 0 0 8px #ff0000;
+    font-size: 1.2em;
     text-align: center;
     padding: 0 15px;
+    color: white; /* messaggi in bianco */
+    text-shadow: 0 0 10px #000;
   }
 
   #readButton {
     display: none;
-    margin-top: 20px;
+    margin: 15px 0 0 0; /* più vicino al messaggio */
     background-color: #ff0000;
     color: white;
     border: none;
@@ -83,10 +89,13 @@
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
 
   #readButton:hover {
     background-color: #ff3333;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #ff0000;
   }
 
   #clue {
@@ -99,6 +108,25 @@
     color: #ffcccc;
     font-style: italic;
     max-width: 400px;
+  }
+
+  /* Effetto lampo */
+  .flash {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(255, 255, 255, 0.8); /* semi-trasparente */
+    opacity:0;
+    pointer-events:none;
+    z-index: 1000;
+    animation: flashAnimation 0.3s forwards;
+  }
+
+  @keyframes flashAnimation {
+    0% {opacity:0.8;}
+    100% {opacity:0;}
   }
 </style>
 </head>
@@ -120,7 +148,6 @@
 <button id="readButton" onclick="showClue()">LEGGI</button>
 
 <div id="clue">
-  <!-- 🔮 QUI SCRIVI IL TUO INDIZIO FINALE -->
   L’indizio segreto apparirà qui... 
 </div>
 
@@ -186,6 +213,7 @@
       if (formed === correctWord) {
         message.innerHTML = "👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO. <br><br>CLICCA LEGGI.";
         readButton.style.display = "inline-block";
+        triggerFlash();
       } else {
         message.textContent = "❌ PAROLA ERRATA, RIPROVA.";
         readButton.style.display = "none";
@@ -201,6 +229,14 @@
   function showClue() {
     clue.style.display = "block";
     clue.scrollIntoView({ behavior: "smooth" });
+  }
+
+  // Funzione lampo
+  function triggerFlash() {
+    const flash = document.createElement('div');
+    flash.classList.add('flash');
+    document.body.appendChild(flash);
+    setTimeout(() => document.body.removeChild(flash), 300);
   }
 
   createLetterElements();
