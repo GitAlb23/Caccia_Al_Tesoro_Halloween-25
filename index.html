@@ -101,13 +101,14 @@
 
   #clue {
     display: none;
-    margin-top: 10px;
-    padding: 10px;
+    margin-top: 20px; /* più staccato dal bordo e dagli elementi sopra */
+    padding: 15px;
     border: 2px solid #ff0000;
     border-radius: 10px;
     background: rgba(0,0,0,0.8);
     color: #ffcccc;
     font-style: italic;
+    font-size: 1.2em; /* testo più grande */
     max-width: 400px;
     text-align: center;
   }
@@ -217,6 +218,7 @@
   }
 
   function showClue() {
+    clue.textContent = "L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!";
     clue.style.display = "block";
     clue.scrollIntoView({ behavior: "smooth" });
   }
