@@ -14,7 +14,7 @@
 
   body {
     font-family: 'Cinzel', serif;
-    background: url('sfondo_horror2.jpg') no-repeat center center fixed;
+    background: url('sfondo_horror.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -146,9 +146,10 @@
   <div id="lettersArea" class="letters"></div>
 </div>
 
-<div id="clue">
-  L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!
-</div>
+<div id="message"></div>
+
+<!-- Div per l'indizio segreto -->
+<div id="clue" style="display:none;"></div>
 
 <button id="readButton" onclick="showClue()">LEGGI</button>
 
@@ -201,7 +202,7 @@
     const formed = [...wordArea.children].map(l => l.textContent).join("");
     if (formed.length === correctWord.length) {
       if (formed === correctWord) {
-        // 🔹 Messaggio + pulsante dentro riquadro lettere
+        // Messaggio + pulsante dentro riquadro lettere
         lettersArea.innerHTML = "";
 
         const successMessage = document.createElement('div');
@@ -229,6 +230,8 @@
   }
 
   function showClue() {
+    // Qui inseriamo il tuo indizio personalizzato
+    clue.textContent = "L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!";
     clue.style.display = "block";
     clue.scrollIntoView({ behavior: "smooth" });
   }
@@ -245,7 +248,3 @@
 
 </body>
 </html>
-
-
-
-
