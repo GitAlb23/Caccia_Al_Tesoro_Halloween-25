@@ -70,6 +70,17 @@
     transition:all .3s;
   }
   .letter:active{ cursor:grabbing; transform:scale(1.05); }
+  .letter.correct {
+    color: #00ff66;
+    border-color: #00ff66;
+    background: rgba(0,50,0,0.8);
+    animation: pulseGreen 0.6s infinite;
+  }
+  @keyframes pulseGreen {
+    0% { transform: scale(1); box-shadow: 0 0 4px #00ff66; }
+    50% { transform: scale(1.1); box-shadow: 0 0 12px #00ff66; }
+    100% { transform: scale(1); box-shadow: 0 0 4px #00ff66; }
+  }
   .message{
     width:100%;
     box-sizing:border-box;
@@ -115,6 +126,17 @@
   .modal button { margin-top:10px; padding:8px 12px; border-radius:8px; border:none; background:var(--accent); color:#fff; cursor:pointer; }
   .flash{ position:fixed; inset:0; background:#fff; opacity:.85; z-index:10000; animation:fadeFlash .28s forwards; pointer-events:none; }
   @keyframes fadeFlash{ from {opacity:.85} to {opacity:0} }
+
+  @keyframes shake {
+    0% { transform: translate(0px, 0px); }
+    20% { transform: translate(-2px, 0px); }
+    40% { transform: translate(2px, 0px); }
+    60% { transform: translate(-2px, 0px); }
+    80% { transform: translate(2px, 0px); }
+    100% { transform: translate(0px, 0px); }
+  }
+  .panel.shake { animation: shake 0.3s; }
+
   @media (max-height:600px){
     .letters { min-height:56px; gap:6px; }
     .letter { width:38px; height:38px; font-size:18px; }
@@ -152,29 +174,26 @@ const lettersArea = document.getElementById('lettersArea');
 const modalOverlay = document.getElementById('modalOverlay');
 const closeClueBtn = document.getElementById('closeClue');
 const title = document.getElementById('title');
+const panelWord = document.getElementById('panelWord');
+const panelLetters = document.getElementById('panelLetters');
 
 let readButtonEl = null;
 let messageEl = null;
 let successActive = false;
-let audioStarted = false; // traccia1 parte al primo click
+let audioStarted = false;
 
-/* ---------- AUDIO ---------- */
-const audio1 = new Audio('traccia1.mp3');
-audio1.loop = true;
-audio1.volume = 0.6;
-
-const audio2 = new Audio('traccia2.mp3');
+// ---------- AUDIO ----------
+const audio1 = new Audio('traccia1.mp3'); // musica di sottofondo
+audio1.loop = true; audio1.volume = 0.5;
+const audio2 = new Audio('traccia2.mp3'); // errore
 audio2.volume = 0.7;
+const audio3 = new Audio('traccia3.mp3'); // successo
+audio3.loop = false; audio3.volume = 0.6;
 
-const audio3 = new Audio('traccia3.mp3');
-audio3.loop = false;
-audio3.volume = 0.6;
-
-/* ---------- UTILS ---------- */
+// ---------- UTILS ----------
 function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
 function triggerFlash(){ const f=document.createElement('div'); f.className='flash'; document.body.appendChild(f); setTimeout(()=>f.remove(),280); }
 
-/* ---------- LETTERE ---------- */
 function createLetterElements(){
   lettersArea.innerHTML = '';
   const shuffled = shuffle(letters);
@@ -185,17 +204,15 @@ function createLetterElements(){
     el.draggable = true;
     el.id = 'letter-' + idx + '-' + Date.now();
     el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', el.id));
-    el.addEventListener('click', () => moveLetterByClick(el));
+    el.addEventListener('click', () => {
+      if(!audioStarted){ audio1.play().catch(()=>{}); audioStarted=true; }
+      moveLetterByClick(el);
+    });
     lettersArea.appendChild(el);
   });
 }
 
 function moveLetterByClick(letterEl){
-  if(!audioStarted){
-    audio1.play().catch(()=>{});
-    audioStarted = true;
-  }
-
   if(successActive) return;
   const wasInLetters = letterEl.parentElement === lettersArea;
   removeMessageIfAny();
@@ -221,32 +238,35 @@ function removeMessageIfAny(){
   if (readButtonEl && readButtonEl.parentElement) { readButtonEl.remove(); readButtonEl = null; }
 }
 
-/* ---------- DROP LISTENERS ---------- */
 wordArea.addEventListener('dragover', allowDrop);
 lettersArea.addEventListener('dragover', allowDrop);
 wordArea.addEventListener('drop', handleDrop);
 lettersArea.addEventListener('drop', handleDrop);
 
-/* ---------- VERIFICA ---------- */
+// ---------- LOGICA PAROLA ----------
 function checkWord(){
-  const formed = Array.from(wordArea.querySelectorAll('.letter')).map(n => n.textContent).join('');
-  const placedCount = wordArea.querySelectorAll('.letter').length;
+  const lettersInWord = Array.from(wordArea.querySelectorAll('.letter'));
+  const formed = lettersInWord.map(l => l.textContent).join('');
   const neededCount = correctWord.length;
 
-  if (placedCount < neededCount) {
-    if (messageEl) removeMessageIfAny();
-    return;
-  }
+  lettersInWord.forEach(l => l.classList.remove('correct'));
+  if(lettersInWord.length < neededCount) return;
 
-  if (formed === correctWord) {
+  lettersInWord.forEach((l, idx) => {
+    if(correctWord[idx] === l.textContent) l.classList.add('correct');
+  });
+
+  if(formed === correctWord){
     successActive = true;
-    showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
+    showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE!", true);
     triggerFlash();
-    makeGreen(true);
     playSuccessSound();
   } else {
     showMessageInLettersArea("❌ PAROLA ERRATA, RIPROVA.", false);
     playErrorSound();
+    panelWord.classList.add('shake');
+    panelLetters.classList.add('shake');
+    setTimeout(()=>{panelWord.classList.remove('shake'); panelLetters.classList.remove('shake');}, 300);
   }
 }
 
@@ -279,51 +299,28 @@ function resetGame(){
   removeMessageIfAny();
 }
 
-/* ---------- COLORI ---------- */
-function makeGreen(state){
-  const green = "#00ff66";
-  if(state){
-    document.querySelectorAll('.panel, .letter').forEach(el=>{
-      el.style.borderColor = green;
-      el.style.background = "rgba(0,50,0,0.8)";
-      el.style.color = green;
-    });
-    title.style.color = green;
-    title.style.textShadow = `0 0 12px ${green}`;
-  } else {
-    document.querySelectorAll('.panel, .letter').forEach(el=>{
-      el.style.borderColor = "#ff0000";
-      el.style.background = "#111";
-      el.style.color = "#ff3333";
-    });
-    title.style.color = "#ffcc00";
-    title.style.textShadow = "0 0 12px #ff9900";
-  }
-}
-
-/* ---------- MODAL ---------- */
 function openClueModal(){
   modalOverlay.style.display = 'flex';
   modalOverlay.setAttribute('aria-hidden', 'false');
+  stopAllAudio();
+  audio3.currentTime = 0;
+  audio3.play().catch(()=>{});
 }
+
 function closeClueModal(){
   modalOverlay.style.display = 'none';
   modalOverlay.setAttribute('aria-hidden', 'true');
-  makeGreen(false);
   successActive = false;
   resetGame();
-  stopAllAudio();
 }
 
-/* ---------- AUDIO CONTROLLI ---------- */
 function playErrorSound(){
   audio2.currentTime = 0;
   audio2.play().catch(()=>{});
 }
 
 function playSuccessSound(){
-  audio1.pause();
-  audio2.pause();
+  stopAllAudio();
   audio3.currentTime = 0;
   audio3.play().catch(()=>{});
 }
@@ -334,14 +331,7 @@ function stopAllAudio(){
   audio3.pause();
 }
 
-/* ---------- EVENT LISTENERS ---------- */
-closeClueBtn.addEventListener('click', closeClueModal);
-modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
-
-/* ---------- INIT ---------- */
 createLetterElements();
 </script>
 </body>
 </html>
-
-
