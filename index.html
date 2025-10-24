@@ -40,7 +40,7 @@
     border-radius:14px;
     padding:12px;
     text-align:center;
-    box-shadow:0 6px 18px rgba(0,0,0,0.6);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
     transition:border-color .3s, background .3s;
   }
   .label { margin:6px 0 10px; font-weight:700; letter-spacing:1px; }
@@ -78,7 +78,7 @@
     color:#fff;
     text-shadow:0 0 6px #000;
   }
-  #readButton{
+  #readButton, #retryButton{
     display:inline-block;
     margin-top:8px;
     padding:8px 12px;
@@ -89,7 +89,7 @@
     font-weight:700;
     cursor:pointer;
   }
-  #readButton:active{ transform:scale(0.98); }
+  #readButton:active, #retryButton:active{ transform:scale(0.98); }
   .modal-overlay{
     display:none;
     position:fixed;
@@ -144,7 +144,7 @@
 
 <script>
 const correctWord = "ASMODEO";
-const letters = ["A","S","M","O","D","E","O","B","T","R","C","L"]; // aggiunte le 5 extra
+const letters = ["A","S","M","O","D","E","O","B","T","R","C","L"];
 
 const wordArea = document.getElementById('wordArea');
 const lettersArea = document.getElementById('lettersArea');
@@ -241,7 +241,19 @@ function showMessageInLettersArea(text, success){
     readButtonEl.textContent = 'LEGGI';
     readButtonEl.addEventListener('click', openClueModal);
     lettersArea.appendChild(readButtonEl);
+  } else {
+    const retryBtn = document.createElement('button');
+    retryBtn.id = 'retryButton';
+    retryBtn.textContent = 'RIPROVA';
+    retryBtn.addEventListener('click', resetGame);
+    lettersArea.appendChild(retryBtn);
   }
+}
+
+function resetGame(){
+  wordArea.innerHTML = '';
+  createLetterElements();
+  removeMessageIfAny();
 }
 
 function makeGreen(state){
@@ -274,6 +286,7 @@ function closeClueModal(){
   modalOverlay.setAttribute('aria-hidden', 'true');
   makeGreen(false);
   successActive = false;
+  resetGame();
 }
 closeClueBtn.addEventListener('click', closeClueModal);
 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
