@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Caccia al Tesoro Halloween 2025</title>
 <style>
-  /* layout generale - centrato e compatibile mobile */
   :root { --accent: #ff0000; --bg: rgba(0,0,0,0.75); }
   html,body{
     height:100dvh;
@@ -16,25 +15,23 @@
     background: url('sfondo_horror2.jpg') center/cover fixed no-repeat;
     color:#fff;
   }
-  /* wrapper che centra verticalmente i contenuti */
   .page {
     min-height:100dvh;
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:center; /* CENTRATURA VERTICALE */
+    justify-content:center;
     gap:12px;
     padding:16px;
   }
-
   h1{
     margin:0;
     color:#ffcc00;
     text-shadow:0 0 12px #ff9900;
     font-size:1.6rem;
     text-align:center;
+    transition:color .3s, text-shadow .3s;
   }
-
   .panel{
     width:100%;
     max-width:420px;
@@ -43,21 +40,19 @@
     border-radius:14px;
     padding:12px;
     text-align:center;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    box-shadow:0 6px 18px rgba(0,0,0,0.6);
+    transition:border-color .3s, background .3s;
   }
-
   .label { margin:6px 0 10px; font-weight:700; letter-spacing:1px; }
-
   .letters {
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
     gap:8px;
-    min-height:72px;              /* assicura spazio per messaggi + bottone */
+    min-height:72px;
     align-items:center;
     padding:8px;
   }
-
   .letter{
     width:44px;
     height:44px;
@@ -72,9 +67,9 @@
     justify-content:center;
     cursor:grab;
     user-select:none;
+    transition:all .3s;
   }
   .letter:active{ cursor:grabbing; transform:scale(1.05); }
-
   .message{
     width:100%;
     box-sizing:border-box;
@@ -83,7 +78,6 @@
     color:#fff;
     text-shadow:0 0 6px #000;
   }
-
   #readButton{
     display:inline-block;
     margin-top:8px;
@@ -96,8 +90,6 @@
     cursor:pointer;
   }
   #readButton:active{ transform:scale(0.98); }
-
-  /* modal overlay per l'indizio: evita spostamenti della pagina */
   .modal-overlay{
     display:none;
     position:fixed;
@@ -120,12 +112,8 @@
     font-style:italic;
   }
   .modal button { margin-top:10px; padding:8px 12px; border-radius:8px; border:none; background:var(--accent); color:#fff; cursor:pointer; }
-
-  /* piccolo flash effect */
   .flash{ position:fixed; inset:0; background:#fff; opacity:.85; z-index:10000; animation:fadeFlash .28s forwards; pointer-events:none; }
   @keyframes fadeFlash{ from {opacity:.85} to {opacity:0} }
-
-  /* responsive tweaks */
   @media (max-height:600px){
     .letters { min-height:56px; gap:6px; }
     .letter { width:38px; height:38px; font-size:18px; }
@@ -134,20 +122,19 @@
 </head>
 <body>
   <div class="page">
-    <h1>Caccia al Tesoro Halloween 2025</h1>
+    <h1 id="title">Caccia al Tesoro Halloween 2025</h1>
 
-    <div class="panel" aria-label="Componi la parola">
+    <div class="panel" id="panelWord" aria-label="Componi la parola">
       <div class="label">COMPONI LA PAROLA:</div>
       <div id="wordArea" class="letters" aria-live="polite"></div>
     </div>
 
-    <div class="panel" aria-label="Lettere disponibili">
+    <div class="panel" id="panelLetters" aria-label="Lettere disponibili">
       <div class="label">LETTERE DISPONIBILI:</div>
       <div id="lettersArea" class="letters" aria-live="polite"></div>
     </div>
   </div>
 
-  <!-- modal overlay per l'indizio -->
   <div id="modalOverlay" class="modal-overlay" role="dialog" aria-hidden="true">
     <div class="modal" role="document">
       <div id="clueText">L’indizio del tesoro hai trovo, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
@@ -156,24 +143,24 @@
   </div>
 
 <script>
-/* ---------- CONFIG ---------- */
 const correctWord = "ASMODEO";
-const letters = ["A","S","M","O","D","E","O"];
+const letters = ["A","S","M","O","D","E","O","B","T","R","C","L"]; // aggiunte le 5 extra
 
-/* ---------- ELEMENTI ---------- */
 const wordArea = document.getElementById('wordArea');
 const lettersArea = document.getElementById('lettersArea');
 const modalOverlay = document.getElementById('modalOverlay');
 const closeClueBtn = document.getElementById('closeClue');
+const title = document.getElementById('title');
+const panelWord = document.getElementById('panelWord');
+const panelLetters = document.getElementById('panelLetters');
 
-let readButtonEl = null;         // riferimento al pulsante LEGGI quando creato
-let messageEl = null;            // riferimento al messaggio creato (errore/complimenti)
+let readButtonEl = null;
+let messageEl = null;
+let successActive = false;
 
-/* ---------- UTILS ---------- */
 function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
 function triggerFlash(){ const f=document.createElement('div'); f.className='flash'; document.body.appendChild(f); setTimeout(()=>f.remove(),280); }
 
-/* crea le 7 lettere - eseguita solo all'avvio (NON verrà chiamata su click di ritorno) */
 function createLetterElements(){
   lettersArea.innerHTML = '';
   const shuffled = shuffle(letters);
@@ -183,110 +170,101 @@ function createLetterElements(){
     el.textContent = ch;
     el.draggable = true;
     el.id = 'letter-' + idx + '-' + Date.now();
-    // drag events
     el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', el.id));
-    // click/tap to toggle move (utile su mobile)
     el.addEventListener('click', () => moveLetterByClick(el));
     lettersArea.appendChild(el);
   });
 }
 
-/* move letter by click/tap: se è nel lettersArea la porta su wordArea, altrimenti la riporta giù.
-   Importante: NON rigeneriamo mai TUTTE le lettere qui. Se c'era un messaggio, lo rimuoviamo. */
 function moveLetterByClick(letterEl){
+  if(successActive) return;
   const wasInLetters = letterEl.parentElement === lettersArea;
-  // se lettersArea conteneva un messaggio (messageEl) lo rimuoviamo per fare posto alla lettera
   removeMessageIfAny();
-
-  if (wasInLetters) {
-    wordArea.appendChild(letterEl);
-  } else {
-    lettersArea.appendChild(letterEl);
-  }
+  if (wasInLetters) wordArea.appendChild(letterEl);
+  else lettersArea.appendChild(letterEl);
   checkWord();
 }
 
-/* drop handlers robusti (usiamo currentTarget) */
 function allowDrop(ev){ ev.preventDefault(); }
 function handleDrop(ev){
+  if(successActive) return;
   ev.preventDefault();
   const id = ev.dataTransfer.getData('text/plain');
   const el = document.getElementById(id);
   if (!el) return;
-  // se c'era un messaggio lo rimuoviamo prima di appendere
   removeMessageIfAny();
   ev.currentTarget.appendChild(el);
   checkWord();
 }
 
-/* pulisce messaggio + bottone se presenti (ma NON rigenera tutte le lettere) */
 function removeMessageIfAny(){
   if (messageEl && messageEl.parentElement) { messageEl.remove(); messageEl = null; }
   if (readButtonEl && readButtonEl.parentElement) { readButtonEl.remove(); readButtonEl = null; }
 }
 
-/* ---------- attach drop listeners ---------- */
 wordArea.addEventListener('dragover', allowDrop);
 lettersArea.addEventListener('dragover', allowDrop);
 wordArea.addEventListener('drop', handleDrop);
 lettersArea.addEventListener('drop', handleDrop);
 
-/* quando l'utente riporta UNA lettera indietro tramite click o drop, non dobbiamo rigenerare altre lettere.
-   Nota: non chiamiamo più createLetterElements qui. */
-
-/* ---------- verifica parola ---------- */
 function checkWord(){
-  // compone la parola usando SOLO gli elementi .letter presenti nel wordArea (ignorare eventuali bottoni o messaggi)
   const formed = Array.from(wordArea.querySelectorAll('.letter')).map(n => n.textContent).join('');
   const placedCount = wordArea.querySelectorAll('.letter').length;
-  const totalLetters = letters.length;
+  const neededCount = correctWord.length;
 
-  // se non ha ancora piazzato tutte le lettere, togli eventuali messaggi (ma non rigenerare lettere)
-  if (placedCount < totalLetters) {
-    // se c'era un messaggio lo rimuoviamo per permettere di riportare lettere
+  if (placedCount < neededCount) {
     if (messageEl) removeMessageIfAny();
-    return; // niente verifica fino a quando non sono tutte piazzate
+    return;
   }
 
-  // se siamo qui -> tutte le lettere sono nel wordArea -> verifichiamo la sequenza
   if (formed === correctWord) {
-    // mostra messaggio di successo NEL riquadro delle lettere (lettersArea), senza rigenerare altre lettere
+    successActive = true;
     showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
     triggerFlash();
+    makeGreen(true);
   } else {
-    // messaggio errore nel riquadro delle lettere; le lettere restano fisicamente nel wordArea così l'utente può riportarne una
     showMessageInLettersArea("❌ PAROLA ERRATA, RIPROVA.", false);
   }
 }
 
-/* mostra messaggio (testo) e, se success=true, crea anche il bottone LEGGI.
-   IMPORTANTE: non rigeneriamo le lettere: lettersArea viene svuotato solo per mostrare il messaggio. */
 function showMessageInLettersArea(text, success){
-  // rimuoviamo eventuali messaggi precedenti
   removeMessageIfAny();
-
-  // svuota lettersArea (non tocca il wordArea)
   lettersArea.innerHTML = '';
-
-  // crea elemento messaggio
   messageEl = document.createElement('div');
   messageEl.className = 'message';
   messageEl.textContent = text;
   lettersArea.appendChild(messageEl);
 
   if (success) {
-    // crea LEGGI
     readButtonEl = document.createElement('button');
     readButtonEl.id = 'readButton';
     readButtonEl.textContent = 'LEGGI';
     readButtonEl.addEventListener('click', openClueModal);
     lettersArea.appendChild(readButtonEl);
-  } else {
-    readButtonEl = null;
   }
 }
 
-/* ---------- modal per indizio (overlay) ---------- */
+function makeGreen(state){
+  const green = "#00ff66";
+  if(state){
+    document.querySelectorAll('.panel, .letter').forEach(el=>{
+      el.style.borderColor = green;
+      el.style.background = "rgba(0,50,0,0.8)";
+      el.style.color = green;
+    });
+    title.style.color = green;
+    title.style.textShadow = `0 0 12px ${green}`;
+  } else {
+    document.querySelectorAll('.panel, .letter').forEach(el=>{
+      el.style.borderColor = "#ff0000";
+      el.style.background = "#111";
+      el.style.color = "#ff3333";
+    });
+    title.style.color = "#ffcc00";
+    title.style.textShadow = "0 0 12px #ff9900";
+  }
+}
+
 function openClueModal(){
   modalOverlay.style.display = 'flex';
   modalOverlay.setAttribute('aria-hidden', 'false');
@@ -294,21 +272,13 @@ function openClueModal(){
 function closeClueModal(){
   modalOverlay.style.display = 'none';
   modalOverlay.setAttribute('aria-hidden', 'true');
+  makeGreen(false);
+  successActive = false;
 }
 closeClueBtn.addEventListener('click', closeClueModal);
 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
 
-/* ---------- inizializzazione ---------- */
 createLetterElements();
-
-/* ---------- NOTE comportamentali:
- - Le lettere vengono create una sola volta all'avvio.
- - Quando compare "PAROLA ERRATA" o "COMPLIMENTI", le lettere restano fisicamente su wordArea:
-   lettersArea viene provvisoriamente svuotato per mostrare il messaggio. L'utente può riportare una singola
-   lettera (drag o click) dal wordArea in basso: al primo movimento il messaggio viene rimosso e la lettera resta.
- - Non rigeneriamo mai l'intero set di 7 lettere automaticamente su click. Se vuoi un bottone "RIPROVA" che riporta automaticamente tutte le lettere in basso,
-   lo aggiungo subito su tua richiesta.
-*/
 </script>
 </body>
 </html>
