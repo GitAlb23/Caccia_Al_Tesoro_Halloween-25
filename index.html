@@ -137,13 +137,22 @@
   }
   .panel.shake { animation: shake 0.3s; }
 
+  @keyframes horrorTremor {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(1px,-1px); }
+    50% { transform: translate(-1px,1px); }
+    75% { transform: translate(1px,1px); }
+    100% { transform: translate(0,0); }
+  }
+  body.horror { animation: horrorTremor 0.5s infinite; }
+
   @media (max-height:600px){
     .letters { min-height:56px; gap:6px; }
     .letter { width:38px; height:38px; font-size:18px; }
   }
 </style>
 </head>
-<body>
+<body class="horror">
 <div class="page">
   <h1 id="title">Caccia al Tesoro Halloween 2025</h1>
 
@@ -182,15 +191,15 @@ let messageEl = null;
 let successActive = false;
 let audioStarted = false;
 
-// ---------- AUDIO ----------
-const audio1 = new Audio('traccia1.mp3'); // musica di sottofondo
+/* ---------- AUDIO ---------- */
+const audio1 = new Audio('traccia1.mp3');
 audio1.loop = true; audio1.volume = 0.5;
-const audio2 = new Audio('traccia2.mp3'); // errore
+const audio2 = new Audio('traccia2.mp3');
 audio2.volume = 0.7;
-const audio3 = new Audio('traccia3.mp3'); // successo
+const audio3 = new Audio('traccia3.mp3');
 audio3.loop = false; audio3.volume = 0.6;
 
-// ---------- UTILS ----------
+/* ---------- LETTERE ---------- */
 function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
 function triggerFlash(){ const f=document.createElement('div'); f.className='flash'; document.body.appendChild(f); setTimeout(()=>f.remove(),280); }
 
@@ -243,7 +252,7 @@ lettersArea.addEventListener('dragover', allowDrop);
 wordArea.addEventListener('drop', handleDrop);
 lettersArea.addEventListener('drop', handleDrop);
 
-// ---------- LOGICA PAROLA ----------
+/* ---------- VERIFICA ---------- */
 function checkWord(){
   const lettersInWord = Array.from(wordArea.querySelectorAll('.letter'));
   const formed = lettersInWord.map(l => l.textContent).join('');
@@ -299,6 +308,7 @@ function resetGame(){
   removeMessageIfAny();
 }
 
+/* ---------- MODAL ---------- */
 function openClueModal(){
   modalOverlay.style.display = 'flex';
   modalOverlay.setAttribute('aria-hidden', 'false');
@@ -306,7 +316,6 @@ function openClueModal(){
   audio3.currentTime = 0;
   audio3.play().catch(()=>{});
 }
-
 function closeClueModal(){
   modalOverlay.style.display = 'none';
   modalOverlay.setAttribute('aria-hidden', 'true');
@@ -330,6 +339,9 @@ function stopAllAudio(){
   audio2.pause();
   audio3.pause();
 }
+
+closeClueBtn.addEventListener('click', closeClueModal);
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
 
 createLetterElements();
 </script>
