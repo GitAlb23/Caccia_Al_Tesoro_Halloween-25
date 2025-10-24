@@ -223,8 +223,10 @@ function checkWord(){
     showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
     triggerFlash();
     makeGreen(true);
+    playSuccessSound(); // AUDIO SUCCESSO
   } else {
     showMessageInLettersArea("❌ PAROLA ERRATA, RIPROVA.", false);
+    playErrorSound();   // AUDIO ERRORE
   }
 }
 
@@ -288,7 +290,42 @@ function closeClueModal(){
   makeGreen(false);
   successActive = false;
   resetGame();
+  stopAllAudio();
 }
+
+/* ---------------- AUDIO ---------------- */
+const audio1 = new Audio('traccia1.mp3');
+audio1.loop = true;
+audio1.volume = 0.5;
+
+const audio2 = new Audio('traccia2.mp3');
+audio2.volume = 0.7;
+
+const audio3 = new Audio('traccia3.mp3');
+audio3.loop = true;
+audio3.volume = 0.6;
+
+// autoplay traccia1
+audio1.play().catch(()=>{});
+
+function playErrorSound(){
+  audio2.currentTime = 0;
+  audio2.play().catch(()=>{});
+}
+
+function playSuccessSound(){
+  audio1.pause();
+  audio2.pause();
+  audio3.currentTime = 0;
+  audio3.play().catch(()=>{});
+}
+
+function stopAllAudio(){
+  audio1.pause();
+  audio2.pause();
+  audio3.pause();
+}
+
 closeClueBtn.addEventListener('click', closeClueModal);
 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
 
@@ -296,5 +333,3 @@ createLetterElements();
 </script>
 </body>
 </html>
-
-
