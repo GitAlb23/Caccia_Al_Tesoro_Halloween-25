@@ -122,26 +122,26 @@
 </style>
 </head>
 <body>
-  <div class="page">
-    <h1 id="title">Caccia al Tesoro Halloween 2025</h1>
+<div class="page">
+  <h1 id="title">Caccia al Tesoro Halloween 2025</h1>
 
-    <div class="panel" id="panelWord" aria-label="Componi la parola">
-      <div class="label">COMPONI LA PAROLA -7 lettere-:</div>
-      <div id="wordArea" class="letters" aria-live="polite"></div>
-    </div>
-
-    <div class="panel" id="panelLetters" aria-label="Lettere disponibili">
-      <div class="label">LETTERE DISPONIBILI:</div>
-      <div id="lettersArea" class="letters" aria-live="polite"></div>
-    </div>
+  <div class="panel" id="panelWord" aria-label="Componi la parola">
+    <div class="label">COMPONI LA PAROLA -7 lettere-:</div>
+    <div id="wordArea" class="letters" aria-live="polite"></div>
   </div>
 
-  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-hidden="true">
-    <div class="modal" role="document">
-      <div id="clueText">L’indizio del tesoro hai trovatu, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
-      <button id="closeClue">CHIUDI</button>
-    </div>
+  <div class="panel" id="panelLetters" aria-label="Lettere disponibili">
+    <div class="label">LETTERE DISPONIBILI:</div>
+    <div id="lettersArea" class="letters" aria-live="polite"></div>
   </div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal" role="document">
+    <div id="clueText">L’indizio del tesoro hai trovatu, i ru cazzu me cagatu. Se ru demone vu nzerrà, chella cosa rossa a trovà!!</div>
+    <button id="closeClue">CHIUDI</button>
+  </div>
+</div>
 
 <script>
 const correctWord = "ASMODEO";
@@ -152,8 +152,6 @@ const lettersArea = document.getElementById('lettersArea');
 const modalOverlay = document.getElementById('modalOverlay');
 const closeClueBtn = document.getElementById('closeClue');
 const title = document.getElementById('title');
-const panelWord = document.getElementById('panelWord');
-const panelLetters = document.getElementById('panelLetters');
 
 let readButtonEl = null;
 let messageEl = null;
@@ -223,10 +221,10 @@ function checkWord(){
     showMessageInLettersArea("👹 COMPLIMENTI, HAI INDOVINATO IL NOME DEL DEMONE E HAI SBLOCCATO L’ULTIMO INDIZIO CHE TI PORTERÀ AL TESORO.", true);
     triggerFlash();
     makeGreen(true);
-    playSuccessSound(); // AUDIO SUCCESSO
+    playSuccessSound();
   } else {
     showMessageInLettersArea("❌ PAROLA ERRATA, RIPROVA.", false);
-    playErrorSound();   // AUDIO ERRORE
+    playErrorSound();
   }
 }
 
@@ -302,11 +300,12 @@ const audio2 = new Audio('traccia2.mp3');
 audio2.volume = 0.7;
 
 const audio3 = new Audio('traccia3.mp3');
-audio3.loop = true;
+audio3.loop = false; // NON fare loop
 audio3.volume = 0.6;
 
-// autoplay traccia1
-audio1.play().catch(()=>{});
+window.addEventListener('load', () => {
+  audio1.play().catch(()=>{});
+});
 
 function playErrorSound(){
   audio2.currentTime = 0;
