@@ -225,8 +225,6 @@ const audio2 = new Audio('traccia2.mp3');
 audio2.volume = 0.7;
 const audio3 = new Audio('traccia3.mp3');
 audio3.loop = false; audio3.volume = 0.6;
-
-// 🔥 nuova traccia4
 const audio4 = new Audio('traccia4.mp3');
 audio4.loop = true;
 audio4.volume = 0.4;
@@ -323,7 +321,10 @@ function showMessageInLettersArea(text, success){
     readButtonEl = document.createElement('button');
     readButtonEl.id = 'readButton';
     readButtonEl.textContent = 'LEGGI';
-    readButtonEl.addEventListener('click', openClueModal);
+    readButtonEl.addEventListener('click', () => {
+      modalOverlay.style.display = 'flex';
+      modalOverlay.setAttribute('aria-hidden', 'false');
+    });
     lettersArea.appendChild(readButtonEl);
   } else {
     const retryBtn = document.createElement('button');
@@ -341,44 +342,31 @@ function resetGame(){
 }
 
 /* ---------- MODAL ---------- */
-function openClueModal(){
-  modalOverlay.style.display = 'flex';
-  modalOverlay.setAttribute('aria-hidden', 'false');
-  stopAllAudio();
-  audio3.currentTime = 0;
-  audio4.currentTime = 0;
-  audio3.play().catch(()=>{});
-  audio4.play().catch(()=>{});
-}
-function closeClueModal(){
-  modalOverlay.style.display = 'none';
-  modalOverlay.setAttribute('aria-hidden', 'true');
-  successActive = false;
-  resetGame();
-}
-
 function playErrorSound(){
   audio2.currentTime = 0;
   audio2.play().catch(()=>{});
 }
 
 function playSuccessSound(){
-  stopAllAudio();
-  audio3.currentTime = 0;
-  audio4.currentTime = 0;
-  audio3.play().catch(()=>{});
-  audio4.play().catch(()=>{});
+  if(!audio3.playing){ audio3.currentTime = 0; audio3.play().catch(()=>{}); }
+  if(!audio4.playing){ audio4.currentTime = 0; audio4.play().catch(()=>{}); }
 }
 
-function stopAllAudio(){
-  audio1.pause();
-  audio2.pause();
-  audio3.pause();
-  audio4.pause();
-}
+closeClueBtn.addEventListener('click', () => {
+  modalOverlay.style.display = 'none';
+  modalOverlay.setAttribute('aria-hidden', 'true');
+  successActive = false;
+  resetGame();
+});
 
-closeClueBtn.addEventListener('click', closeClueModal);
 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
+
+function closeClueModal(){
+  modalOverlay.style.display = 'none';
+  modalOverlay.setAttribute('aria-hidden', 'true');
+  successActive = false;
+  resetGame();
+}
 
 createLetterElements();
 </script>
