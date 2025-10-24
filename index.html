@@ -198,7 +198,6 @@ const wordArea = document.getElementById('wordArea');
 const lettersArea = document.getElementById('lettersArea');
 const modalOverlay = document.getElementById('modalOverlay');
 const closeClueBtn = document.getElementById('closeClue');
-const title = document.getElementById('title');
 const panelWord = document.getElementById('panelWord');
 const panelLetters = document.getElementById('panelLetters');
 const flameContainer = document.getElementById('flameContainer');
@@ -219,15 +218,10 @@ for(let i=0;i<40;i++){
 }
 
 /* ---------- AUDIO ---------- */
-const audio1 = new Audio('traccia1.mp3');
-audio1.loop = true; audio1.volume = 0.5;
-const audio2 = new Audio('traccia2.mp3');
-audio2.volume = 0.7;
-const audio3 = new Audio('traccia3.mp3');
-audio3.loop = false; audio3.volume = 0.6;
-const audio4 = new Audio('traccia4.mp3');
-audio4.loop = true;
-audio4.volume = 0.4;
+const audio1 = new Audio('traccia1.mp3'); audio1.loop = true; audio1.volume = 0.5;
+const audio2 = new Audio('traccia2.mp3'); audio2.volume = 0.7;
+const audio3 = new Audio('traccia3.mp3'); audio3.loop = false; audio3.volume = 0.6;
+const audio4 = new Audio('traccia4.mp3'); audio4.loop = true; audio4.volume = 0.4;
 
 /* ---------- LETTERE ---------- */
 function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
@@ -324,6 +318,7 @@ function showMessageInLettersArea(text, success){
     readButtonEl.addEventListener('click', () => {
       modalOverlay.style.display = 'flex';
       modalOverlay.setAttribute('aria-hidden', 'false');
+      // non fermare audio3/4
     });
     lettersArea.appendChild(readButtonEl);
   } else {
@@ -341,15 +336,16 @@ function resetGame(){
   removeMessageIfAny();
 }
 
-/* ---------- MODAL ---------- */
 function playErrorSound(){
   audio2.currentTime = 0;
   audio2.play().catch(()=>{});
 }
 
 function playSuccessSound(){
-  if(!audio3.playing){ audio3.currentTime = 0; audio3.play().catch(()=>{}); }
-  if(!audio4.playing){ audio4.currentTime = 0; audio4.play().catch(()=>{}); }
+  audio1.pause();
+  audio2.pause();
+  if(audio3.paused){ audio3.currentTime = 0; audio3.play().catch(()=>{}); }
+  if(audio4.paused){ audio4.currentTime = 0; audio4.play().catch(()=>{}); }
 }
 
 closeClueBtn.addEventListener('click', () => {
@@ -360,7 +356,6 @@ closeClueBtn.addEventListener('click', () => {
 });
 
 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
-
 function closeClueModal(){
   modalOverlay.style.display = 'none';
   modalOverlay.setAttribute('aria-hidden', 'true');
