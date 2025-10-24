@@ -156,10 +156,25 @@ const title = document.getElementById('title');
 let readButtonEl = null;
 let messageEl = null;
 let successActive = false;
+let audioStarted = false; // traccia1 parte al primo click
 
+/* ---------- AUDIO ---------- */
+const audio1 = new Audio('traccia1.mp3');
+audio1.loop = true;
+audio1.volume = 0.5;
+
+const audio2 = new Audio('traccia2.mp3');
+audio2.volume = 0.7;
+
+const audio3 = new Audio('traccia3.mp3');
+audio3.loop = false;
+audio3.volume = 0.6;
+
+/* ---------- UTILS ---------- */
 function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
 function triggerFlash(){ const f=document.createElement('div'); f.className='flash'; document.body.appendChild(f); setTimeout(()=>f.remove(),280); }
 
+/* ---------- LETTERE ---------- */
 function createLetterElements(){
   lettersArea.innerHTML = '';
   const shuffled = shuffle(letters);
@@ -176,6 +191,11 @@ function createLetterElements(){
 }
 
 function moveLetterByClick(letterEl){
+  if(!audioStarted){
+    audio1.play().catch(()=>{});
+    audioStarted = true;
+  }
+
   if(successActive) return;
   const wasInLetters = letterEl.parentElement === lettersArea;
   removeMessageIfAny();
@@ -201,11 +221,13 @@ function removeMessageIfAny(){
   if (readButtonEl && readButtonEl.parentElement) { readButtonEl.remove(); readButtonEl = null; }
 }
 
+/* ---------- DROP LISTENERS ---------- */
 wordArea.addEventListener('dragover', allowDrop);
 lettersArea.addEventListener('dragover', allowDrop);
 wordArea.addEventListener('drop', handleDrop);
 lettersArea.addEventListener('drop', handleDrop);
 
+/* ---------- VERIFICA ---------- */
 function checkWord(){
   const formed = Array.from(wordArea.querySelectorAll('.letter')).map(n => n.textContent).join('');
   const placedCount = wordArea.querySelectorAll('.letter').length;
@@ -236,7 +258,7 @@ function showMessageInLettersArea(text, success){
   messageEl.textContent = text;
   lettersArea.appendChild(messageEl);
 
-  if (success) {
+  if(success){
     readButtonEl = document.createElement('button');
     readButtonEl.id = 'readButton';
     readButtonEl.textContent = 'LEGGI';
@@ -257,6 +279,7 @@ function resetGame(){
   removeMessageIfAny();
 }
 
+/* ---------- COLORI ---------- */
 function makeGreen(state){
   const green = "#00ff66";
   if(state){
@@ -278,6 +301,7 @@ function makeGreen(state){
   }
 }
 
+/* ---------- MODAL ---------- */
 function openClueModal(){
   modalOverlay.style.display = 'flex';
   modalOverlay.setAttribute('aria-hidden', 'false');
@@ -291,22 +315,7 @@ function closeClueModal(){
   stopAllAudio();
 }
 
-/* ---------------- AUDIO ---------------- */
-const audio1 = new Audio('traccia1.mp3');
-audio1.loop = true;
-audio1.volume = 0.5;
-
-const audio2 = new Audio('traccia2.mp3');
-audio2.volume = 0.7;
-
-const audio3 = new Audio('traccia3.mp3');
-audio3.loop = false; // NON fare loop
-audio3.volume = 0.6;
-
-window.addEventListener('load', () => {
-  audio1.play().catch(()=>{});
-});
-
+/* ---------- AUDIO CONTROLLI ---------- */
 function playErrorSound(){
   audio2.currentTime = 0;
   audio2.play().catch(()=>{});
@@ -325,9 +334,11 @@ function stopAllAudio(){
   audio3.pause();
 }
 
+/* ---------- EVENT LISTENERS ---------- */
 closeClueBtn.addEventListener('click', closeClueModal);
 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeClueModal(); });
 
+/* ---------- INIT ---------- */
 createLetterElements();
 </script>
 </body>
